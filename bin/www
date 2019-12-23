@@ -20,25 +20,25 @@ var credentials = { key: privateKey, cert: certificate };
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+// var port = normalizePort(process.env.PORT || '3000');
+// app.set('port', port);
 
-/**
- * Create HTTP server.
- */
+// /**
+//  * Create HTTP server.
+//  */
 
-var server = http.createServer(app);
+// var server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+// /**
+//  * Listen on provided port, on all network interfaces.
+//  */
 
-server.listen(port);
-// app.listen(process.env.PORT || 3000, function () {
-//   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
-// });
-server.on('error', onError);
-server.on('listening', onListening);
+// server.listen(port);
+// // app.listen(process.env.PORT || 3000, function () {
+// //   console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
+// // });
+// server.on('error', onError);
+// server.on('listening', onListening);
 
 //------------------------------ for SSL ------------------------------------
 var port1 = normalizePort(process.env.PORT || '8443');
