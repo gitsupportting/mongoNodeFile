@@ -83,48 +83,6 @@ db.connect(_dbUrl, dbname, function (err) {
   }
 });
 
-// ---------- For test as local data ---------------
-var coursesData = [
-  {
-    id: 1,
-    title: 'The Complete Node.js Developer Course',
-    author: 'Andrew Mead, Rob Percival',
-    description: 'Learn Node.js by building real-world applications with Node, Express, MongoDB, Mocha, and more!',
-    topic: 'Node.js',
-    url: 'https://codingthesmartway.com/courses/nodejs/'
-  }
-];
-
-
-
-var getCourse = function (args) {
-  var id = args.id;
-  return coursesData.filter(course => {
-    return course.id === id;
-  })[0];
-};
-
-var getCourses = function (args) {
-  if (args.topic) {
-    var topic = args.topic;
-    return coursesData.filter(course => course.topic === topic);
-  } else {
-    return coursesData;
-  }
-};
-
-var updateCourseTopic = function ({ id, topic }) {
-  coursesData.map(course => {
-    if (course.id === id) {
-      course.topic = topic;
-      return course;
-    }
-  });
-  return coursesData.filter(course => course.id === id)[0];
-};
-
-
-
 
 
 
