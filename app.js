@@ -4,19 +4,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
-
-var ODataServer = require('simple-odata-server');
 var Adapter = require('simple-odata-server-mongodb');
 var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var getdataRouter = require('./routes/getdata');
-var recordType = require('./routes/recordType');
-var accountId = require('./routes/accountId');
-var query = require('./routes/query');
-var oauth = require('./routes/oauth2');
-var order = require('./routes/order');
 var file = require('./routes/file');
 var userAuth = require('./routes/authenticate');
 
@@ -51,31 +43,15 @@ app.use('/userauth', userAuth);
 app.use('/getdata', userAuth);
 
 app.use('/', indexRouter);
-app.use('/getdata', getdataRouter);
-app.use('/recordType', recordType);
-app.use('/accountId', accountId);
 
-/* set JWT token */
-app.use('/orders/for-user', userAuth);
-app.use('/orders/for-user', oauth);
-app.use('/orders/validate', userAuth);
-app.use('/orders/validate', oauth);
-app.use('/orders', userAuth);
-app.use('/orders', oauth);
+
 
 /* set OAuth token verification */
-app.use('/query', oauth);
 app.use('/files', userAuth);
-app.use('/menu', oauth);
-app.use('/orders/:orderId/ack', oauth);
-
 /* user create and login */
 app.use('/', usersRouter);
 
-/* order validate and submit */
-app.use('/', order);
-/* various queries */
-app.use('/', query);
+
 /* file control API */
 app.use('/', file);
 
@@ -95,33 +71,6 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-var entityType = config.database + '.Product';
-var model = {
-  namespace: config.database,
-  entityTypes: {
-    'Product': {
-      '_id': { 'type': 'Edm.String', key: true },
-      'accountId': { 'type': 'Edm.String' },
-      'recordType': { 'type': 'Edm.String' },
-      'dateRecorded': { 'type': 'Edm.String' },
-      'data': { 'type': 'Edm.Data' }
-    },
-    'Data': {
-      'SalesProductId': { 'type': 'Edm.String' },
-      'SalesProductName': { 'type': 'Edm.String' },
-      'SalesCategoryName': { 'type': 'Edm.String' }
-    }
-  },
-  entitySets: {
-    [config.collection]: {
-      entityType: entityType
-    }
-  }
-};
-
-// Instantiates ODataServer and assigns to odataserver variable.
-var odataServer = new ODataServer()
-  .model(model);
 
 // Connect to Mongo on start
 db.connect(_dbUrl, dbname, function (err) {
@@ -131,8 +80,6 @@ db.connect(_dbUrl, dbname, function (err) {
     process.exit(1);
   } else {
     console.log('Connected successfully database...');
-    var dbo = db.get();
-    odataServer.adapter(Adapter(function (cb) { cb(err, dbo); }));
   }
 });
 
@@ -176,43 +123,9 @@ var updateCourseTopic = function ({ id, topic }) {
   return coursesData.filter(course => course.id === id)[0];
 };
 
-var getProducts = async (args) => {
-  var collection = db.get().collection(config.collection);
-  if (args.recordType) {
-    var pattern = args.recordType;
-    var result = await collection.find({ 'recordType': pattern }).toArray();
-    return result;
-  }
 
-  if (args.substringofRecordType) {
-    pattern = args.substringofRecordType;
-    result = await collection.find({ 'recordType': { $regex: new RegExp(pattern), $options: 'i' } }).toArray();
-    return result;
-  }
 
-  if (args.startswithRecordType) {
-    pattern = '^' + args.startswithRecordType;
-    result = await collection.find({ 'recordType': { $regex: new RegExp(pattern), $options: 'i' } }).toArray();
-    return result;
-  }
 
-  if (args.endswithRecordType) {
-    pattern = args.endswithRecordType + '$';
-    result = await collection.find({ 'recordType': { $regex: new RegExp(pattern), $options: 'i' } }).toArray();
-    return result;
-  }
-};
-// Root resolver
-var root = {
-  course: getCourse,
-  courses: getCourses,
-  updateCourseTopic: updateCourseTopic,
-  products: getProducts
-};
 
-// OData
-app.use('/odata', function (req, res) {
-  odataServer.handle(req, res);
-});
 
 module.exports = app;
