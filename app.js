@@ -5,9 +5,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 
-var _expressGraphql = require('express-graphql');
-var { buildSchema } = require('graphql');
-
 var ODataServer = require('simple-odata-server');
 var Adapter = require('simple-odata-server-mongodb');
 var cors = require('cors');
@@ -151,37 +148,7 @@ var coursesData = [
   }
 ];
 
-// GraphQL schema
-var schema = buildSchema(`
-    type Query {
-        course(id: Int!): Course
-        courses(topic: String): [Course]
-        products(recordType: String, substringofRecordType: String, startswithRecordType: String, endswithRecordType: String): [Product]
-    },
-    type Course {
-        id: Int
-        title: String
-        author: String
-        description: String
-        topic: String
-        url: String
-    },
-    type data {
-        SalesProductId: String
-        SalesProductName: String
-        SalesCategoryName: String
-    },
-    type Product {
-       _id: ID!
-       accountId: String
-       recordType: String
-       dateRecorded: String
-       data: data
-    },
-    type Mutation {
-        updateCourseTopic(id: Int!, topic: String!): Course
-    }
-`);
+
 
 var getCourse = function (args) {
   var id = args.id;
@@ -242,12 +209,7 @@ var root = {
   updateCourseTopic: updateCourseTopic,
   products: getProducts
 };
-// graphql
-app.use('/graphql', _expressGraphql({
-  schema: schema,
-  rootValue: root,
-  graphiql: true
-}));
+
 // OData
 app.use('/odata', function (req, res) {
   odataServer.handle(req, res);
