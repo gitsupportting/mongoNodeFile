@@ -35,7 +35,7 @@
     "multer": "^1.4.1",
     "node-fetch": "^2.3.0",
     "path": "^0.12.7",
-    "pug": "2.0.0-beta11",
+    "pug": "3.0.1",
     "rimraf": "^3.0.0",
     "simple-odata-server": "^1.1.1",
     "simple-odata-server-mongodb": "^1.0.0",
